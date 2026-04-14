@@ -1,5 +1,5 @@
 // code to authenticate 
- export const auth =  app.use("/admin",(req,res,next)=>{
+ const auth =("/admin",(req,res,next)=>{
   // logic to checking the  request is authorized or not
   const token = "adf";
   const isAuthenticated = token ==="xyz";
@@ -11,7 +11,7 @@
        next()
   }
 })
- export const userAuth =  app.use("/user",(req,res,next)=>{
+const userAuth =("/user",(req,res,next)=>{
   // logic to checking the  request is authorized or not
   const token = "xyz";
   const isAuthenticated = token ==="xyz";
