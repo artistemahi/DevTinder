@@ -1,11 +1,6 @@
 const mongoose = require("mongoose");
 
-async function  connectDB(){
- await  mongoose.connect("mongodb+srv://Mahesh:<db_password>@cluster0.nzs4id0.mongodb.net/DevTinder")
-     
-}
-connectDB().then(()=>{
-    console.log("connected to database");
-}).catch((err)=>{
-    console.log("error connecting to database",err);
-})
+const connectDB = async () => {
+  await mongoose.connect("mongodb://Mahesh:CfBSVpK8BriJK2rm@ac-zy8dtix-shard-00-00.1limp6o.mongodb.net:27017,ac-zy8dtix-shard-00-01.1limp6o.mongodb.net:27017,ac-zy8dtix-shard-00-02.1limp6o.mongodb.net:27017/?ssl=true&replicaSet=atlas-9dbyba-shard-0&authSource=admin&appName=Cluster0");
+};
+module.exports = connectDB;
