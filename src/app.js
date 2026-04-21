@@ -6,14 +6,16 @@ app.use(express.json());
 
 // sign dummy api 
 app.post("/signup",  async (req, res)=>{
-  const userObj = {
-    firstName: "Mahesh",
-    lastName: "Kumar",
-    email: "mahesh@gmail.com",
-    password: "password123",
-    age: 25,
-    gender: "Male"
-  }
+  const data = req.body;
+  const userObj = data;
+  //{
+  // //   firstName: "keshav",
+  // //   lastName: "Kumar",
+  // //   email: "keshav@gmail.com",
+  // //   password: "password1234",
+  // //   age: 25,
+  // //   gender: "Male"
+  //}
   const user = new UserModel(userObj);
   try{
     await user.save();
@@ -23,9 +25,6 @@ app.post("/signup",  async (req, res)=>{
     res.status(400).end(err.message+"error signing up user");
   }
   })
-
-
-
 connectDB()
   .then(() => {
     console.log("connected to database");
