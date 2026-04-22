@@ -4,6 +4,7 @@ const UserModel = require("./models/user");
 const app = express();
 app.use(express.json());
 
+
 // sign dummy api 
 app.post("/signup",  async (req, res)=>{
   const data = req.body;
@@ -25,6 +26,79 @@ app.post("/signup",  async (req, res)=>{
     res.status(400).end(err.message+"error signing up user");
   }
   })
+
+  // get user by email id 
+  app.get("/user", async (req, res)=>{
+    try{
+      const user = await UserModel.find({email : req.body.email})
+      if(user.length===0){
+        res.status(404).end("user not found with this email id");
+        return;
+      }
+      else{
+
+        res.json(user);  // res.send(JSON.stringify(user));
+      }
+    }
+    catch(err){
+      res.status(400).end(err.message +"error fetching user data");
+    }
+  })
+
+// feed api , get all the user from database 
+app.get("/feed", async (req, res)=>{
+  try{
+        const allData = await UserModel.find();
+        res.json(allData);
+    }
+    catch(err){
+      res.status(400).end(err.message + "error fetching user data");
+    }
+} );
+
+// finding user by id 
+app.get("/user", async (req, res)=>{
+  try {
+    const user = await UserModel.findById(req.body.userid);
+    if(user===0){
+      res.status(404).end("user not found");
+    }
+    else{
+      res.json(user);
+    }
+  }
+  catch(err){
+    res.status(400).end(err.message + "error fetching user data");
+  }
+})
+// deleting the user by id
+app.delete("/user", async (req, res)=>{
+  try {
+    const user = await UserModel.findByIdAndDelete(req.body.userid);
+    if(user===0){
+      res.status(404).end("user not found");
+    }
+    else{
+      res.end("user deleted successfully");
+    }   
+  }
+  catch(err){
+    res.status(400).end(err.message + "error deleting user");
+  }
+})
+
+// updating the user by id
+app.patch("/user",async ( req, res)=>{
+  const userid = req.body.userid;
+  const data  = req.body;
+  try{
+    const user = await UserModel.findByIdAndUpdate({_id:userid}, data);
+    res.end("user updated successfully");
+  }
+  catch(err){
+    res.status(400).end(err.message + "error updating user");
+  }
+})
 connectDB()
   .then(() => {
     console.log("connected to database");
