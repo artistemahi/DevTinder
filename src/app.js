@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 
-// sign dummy api 
+// sign upapi 
 app.post("/signup",  async (req, res)=>{
   const data = req.body;
   const userObj = data;
@@ -88,15 +88,27 @@ app.delete("/user", async (req, res)=>{
 })
 
 // updating the user by id
-app.patch("/user",async ( req, res)=>{
-  const userid = req.body.userid;
+app.patch("/user/:userid",async ( req, res)=>{
+  const userid = req.params?.userid;
   const data  = req.body;
   try{
-    const user = await UserModel.findByIdAndUpdate({_id:userid}, data);
+    const ALLOWUPDATE = ["age","about","photoURL","skills"];
+    const isValidOperation = Object.keys(data).every((key)=>{
+     return ALLOWUPDATE.includes(key);
+    });
+    if(!isValidOperation){
+      throw new Error("updates are not allowed");
+    }
+    if(data.skills.length>10){
+      throw new Error("skills should be less than 10");
+    }
+    const user = await UserModel.findByIdAndUpdate({_id:userid}, data,
+      {runValidators : true}
+    );
     res.end("user updated successfully");
   }
   catch(err){
-    res.status(400).end(err.message + "error updating user");
+    res.status(400).end("error updating user: " + err.message );
   }
 })
 connectDB()
