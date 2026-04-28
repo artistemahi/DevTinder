@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Validator = require("validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -53,6 +55,29 @@ const userSchema = new mongoose.Schema({
     default: "Hey there! I am using DevTinder.",
   }
 }, {timestamps:true});
+
+userSchema.methods.getJWTToken = async function(){
+  try{
+     const user = this;
+      const token = jwt.sign({ id: user._id }, "Hare Krishna",);
+      return token;
+  }catch(err){
+    throw new Error("Error generating JWT token: " + err.message);
+  }
+}
+userSchema.methods.ValidatePassword = async function(passwordInputByUser){
+  try{
+    const user = this;
+    const hashedPassword = user.password;
+    const isPassword = await bcrypt.compare(passwordInputByUser, hashedPassword);
+    if(isPassword){
+      return true;
+    }
+  } catch (error) {
+    throw new Error("Invalid password");
+
+  }
+}
 const UserModel = mongoose.model("user", userSchema);
 module.exports = UserModel;
 // or you can do like this  , module.exports = mongoose.model('user', userSchema)

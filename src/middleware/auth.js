@@ -1,29 +1,28 @@
+const UserModel= require("../models/user");
+const jwt = require("jsonwebtoken")
 // code to authenticate 
- const auth =("/admin",(req,res,next)=>{
+ const UserAuth =("/admin",async(req,res,next)=>{
   // logic to checking the  request is authorized or not
-  const token = "adf";
-  const isAuthenticated = token ==="xyz";
-  if(!isAuthenticated){
-
-     res.status(401).send()
+  try{
+  const token = req.cookies.token;
+  if(!token){
+   throw new Error("invalid tokens or token not found");
+  }
+  const decodedObj = await jwt.verify(token,"Hare Krishna");
+  const {id} = decodedObj;
+  const user = await UserModel.findById(id);
+  if(!user){
+   throw new Error("user not found");
   }
   else{
-       next()
+         req.user = user; // attachingthe user data to the request object
+       next();
   }
-})
-const userAuth =("/user",(req,res,next)=>{
-  // logic to checking the  request is authorized or not
-  const token = "xyz";
-  const isAuthenticated = token ==="xyz";
-  if(!isAuthenticated){
-
-     res.status(401).send()
+  }catch(err){
+   res.status(400).end("Error:"+err.message);
   }
-  else{
-       next()
-  }
+  
 })
 module.exports={
-    auth,
-    userAuth
+    UserAuth
 }

@@ -4,10 +4,12 @@ const UserModel = require("./models/user");
 const ValidationFn = require("./utils/ValidationFn");
 const bcrypt = require("bcryptjs");
 const app = express();
+const cookieParser = require("cookie-parser");
+const {UserAuth} = require("./middleware/auth");
 app.use(express.json());
-
-
-// sign upapi
+app.use(cookieParser())
+const jwt = require('jsonwebtoken');
+// sign up api
 app.post("/signup", async (req, res) => {
   try { // validation of data
   ValidationFn(req);
@@ -30,15 +32,20 @@ app.post("/signup", async (req, res) => {
 });
 // login api
 app.post("/login", async (req, res) => {
-
   try {
-      const { email, password } = req.body;
+    const { email, password } = req.body;
     const isUserExist = await UserModel.findOne({ email: email });
     if (!isUserExist) {
       throw new Error("Invalid credentials");
     }
-    const isPasswodMatch = await bcrypt.compare(password, isUserExist.password);
+    const isPasswodMatch = await isUserExist.ValidatePassword(password);
     if (isPasswodMatch) {
+      // jwt token can be generated here and send to client for authentication and authorization
+      const token = await isUserExist.getJWTToken();
+
+      // cookie
+      res.cookie("token", token);
+
       res.json("Login successful!!!" );
     } else {
       throw new Error("Invalid password");
@@ -122,6 +129,21 @@ app.patch("/user/:userid", async (req, res) => {
     res.status(400).end("error updating user: " + err.message);
   }
 });
+// profile
+app.get("/profile", UserAuth, async (req, res) => {
+try{
+  // const user = req.user;
+  const {user} = req;
+  if(!user){
+    res.end("please login again")
+  }
+  else{
+    res.end("Logged in user: " + user.firstName);
+  }
+}   catch (err) {
+    res.status(400).end("Error: " + err.message);
+  }
+})
 connectDB()
   .then(() => {
     console.log("connected to database");
