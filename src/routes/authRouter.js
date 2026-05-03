@@ -11,6 +11,11 @@ const authRouter = express.Router();
 // sign up api
 authRouter.post("/signup", async (req, res) => {
   try { // validation of data
+    // if the user is already signed up with the same email then we will throw an error
+    const isUserExist = await UserModel.findOne({email:req.body.email});
+    if(isUserExist){
+      throw new Error("You are already signed up with this email, please login instead");
+    }
   ValidationFn(req);
   const { firstName, lastName, email, password } = req.body;
   // encryption  of password
@@ -54,4 +59,8 @@ authRouter.post("/login", async (req, res) => {
     res.status(400).end("Error: " + err.message);
   }
 });
+
+
+// // logout api 
+// authRouter.post("/logout", )
 module.exports = authRouter;
