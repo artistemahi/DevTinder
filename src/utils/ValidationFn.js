@@ -14,12 +14,27 @@ const ValidatonFn = (req) => {
     );
   }
 
-//   if (firstName.length < 3 || firstName.length > 20) {
-//     throw new Error("first name should be between 3 and 20 characters");
-//   }  ye bhi schema level pr validation kr rakha h waha se hi error throw ho jayega
+  //   if (firstName.length < 3 || firstName.length > 20) {
+  //     throw new Error("first name should be between 3 and 20 characters");
+  //   }  ye bhi schema level pr validation kr rakha h waha se hi error throw ho jayega
   // if(age && age<18){
   //     throw new Error("age should be greater than or equal to 18");
   // }  ye age vala validation db level pr bhi kr rakha h waha se hi error throw ho jayega
 };
+const validateProfileEdit = (req) => {
+  const allowedFields = ["lastName", "email", "skills", "age", "about"];
 
-module.exports = ValidatonFn;
+  const fields = Object.keys(req.body || {});
+  if (fields.length === 0) {
+    throw new Error("No fields provided for update");
+  }
+
+  fields.forEach((field) => {
+    if (!allowedFields.includes(field)) {
+      throw new Error("field is not allowed to update");
+    }
+  });
+
+  return true;
+};
+module.exports = { ValidatonFn, validateProfileEdit };

@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
     default: "Hey there! I am using DevTinder.",
   }
 }, {timestamps:true});
-
+// this are the offloading functions which information in closely related to users
 userSchema.methods.getJWTToken = async function(){
   try{
      const user = this;
