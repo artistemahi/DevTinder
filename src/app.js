@@ -8,11 +8,12 @@ app.use(cookieParser());
 
 const authRouter = require("./routes/authRouter");
 const { profileRouter } = require("./routes/profileRouter");
-// const requestRouter = require("./routes/requestRouter");
+const requestRouter = require("./routes/requestRouter");
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
-// app.use("/", requestRouter);
+app.use("/", requestRouter);
+
 // feed api , get all the user from database
 app.get("/feed", async (req, res) => {
   try {
