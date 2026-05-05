@@ -1,7 +1,8 @@
 const express = require("express");
 const { UserAuth } = require("../middleware/auth");
-const ConnectionRequest = require("../models/connection");
+const ConnectionRequestModel = require("../models/connection");
 const requestRouter = express.Router();
+const UserModel = require("../models/user");
 
 // request send api
 requestRouter.post(
@@ -13,7 +14,34 @@ requestRouter.post(
       const toUserId = req.params.toUserId;
       const status = req.params.status;
 
-      const connectionRequest = new ConnectionRequest({
+      // validation for status
+      const isAllowed = ["interested", "ignore"];
+      if (!isAllowed.includes(status)) {
+        return res.status(400).json({ error: "invalid status" });
+      }
+      // check if the request already exists
+      const existingRequest = await ConnectionRequestModel.findOne({
+        $or: [
+          { fromUserId, toUserId },
+          { fromUserId: toUserId, toUserId: fromUserId },
+        ],
+      });
+      if (existingRequest) {
+        return res.status(400).json({ error: "request already exists" });
+      }
+
+      // user is not sending request to himself
+      if (fromUserId.equals(toUserId)) {
+        return res
+          .status(400)
+          .json({ error: "you cannot send request to yourself" });
+      }
+      // checking if the toUserId is present in database or not
+      const toUser = await UserModel.findById(toUserId);
+        if (!toUser) { 
+            return res.status(400).json({ error: "user not found" });
+        }
+      const connectionRequest = new ConnectionRequestModel({
         fromUserId,
         toUserId,
         status,
