@@ -1,5 +1,5 @@
 const Validator = require("validator");
-const ValidatonFn = (req) => {
+const ValidationFn = (req) => {
   const { firstName, lastName, email, password, age } = req.body;
   if (!firstName || !email || !password) {
     throw new Error(" name , email and password are required");
@@ -37,4 +37,4 @@ const validateProfileEdit = (req) => {
 
   return true;
 };
-module.exports = { ValidatonFn, validateProfileEdit };
+module.exports = { ValidationFn, validateProfileEdit };

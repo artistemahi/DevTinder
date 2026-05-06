@@ -56,12 +56,51 @@ requestRouter.post(
 );
 
 // request respond api
-// ConnectionRequest.post("/request/respond", UserAuth, async (req, res) => {
-//     try{
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  UserAuth,
+  async (req, res) => {
+    try {
+         // mahesh => kittu 
+        // kittu accept kregi 
+        // logged in user => kittu( toUserId)
+        // status = interested tabhi ye hoga 
+        // kittu request me agar accept ya reject hi kregi 
+        // kiitu ko jo request aaya vo requestId(ye requestId user ki nhi h connection request) valid honi chahiye 
 
-//     }catch(err){
-//         res.status(400).json({error: err.message});
-//     }
-// });
+      const loggedInUser = req.user;
+      const { status, requestId } = req.params;
+
+        // validation for status just accept or reject
+
+      const isAllowed = ["accepted", "rejected"];
+      if (!isAllowed.includes(status)) {
+        return res.status(400).json({ error: "invalid status" });
+      }
+        // checking if the requestId is valid or not
+
+      const request = await ConnectionRequestModel.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+
+      if (!request) {
+        return res.status(404).json({ error: "request not found" });
+      }
+
+      request.status = status;
+      await request.save();
+
+      res.json({
+        message: `Request ${status} successfully`,
+      });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
+  }
+);
+
+
 
 module.exports = requestRouter;
